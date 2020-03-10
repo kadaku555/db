@@ -78,7 +78,9 @@ public class AnimeService {
                 serie.setName(dossSerie.getName());
                 if (!serieDAO.existsByName(serie.getName())) {
                     if (serieDAO.existsByName(serie.getName() + " (incomplet)")) {
-                        serie = serieDAO.findByName(serie.getName() + " (incomplet)");
+                        Serie serieFromDB = serieDAO.findByName(serie.getName() + " (incomplet)");
+                        serieFromDB.setName(serie.getName());
+                        serie = serieDAO.save(serieFromDB);
                     } else {
                         serie = serieDAO.save(serie);
                     }
