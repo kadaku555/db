@@ -1,4 +1,4 @@
-var app = angular.module('myApp', ["xeditable"]);
+var app = angular.module('myApp', ["xeditable", "paginator"]);
 
 app.controller('myCtrl', function($scope, $http) {
     var selectedSerie = {};
@@ -6,11 +6,13 @@ app.controller('myCtrl', function($scope, $http) {
 
     $scope.series = [];
     $scope.tags = [];
+    $scope.paginator = {};
 
     $scope.load = function() {
         $http.get("/series").then(
             function(data){
                 $scope.series = data.data;
+                $scope.paginator.applyQuery($scope.series);
             },
             function(error){
             }
@@ -102,5 +104,5 @@ app.filter("trustUrl", function($sce) {
         });
 
 app.run(['editableOptions', function(editableOptions) {
-    editableOptions.theme = 'bs4'; // bootstrap3 theme. Can be also 'bs4', 'bs2', 'default'
+    editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs4', 'bs2', 'default'
 }]);
