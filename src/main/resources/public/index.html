@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="myApp">
 <head>
-    <title>Hello World</title>
+    <title>Liste des Animes</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
     <script src="app/app.js"></script>
     <script src="app/Paginator.js"></script>
@@ -11,16 +11,35 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link href="css/app.css" rel="stylesheet">
     <link href="css/xeditable.min.css" rel="stylesheet">
     <script src="app/xeditable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ng-tags-input/3.1.1/ng-tags-input.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/ng-tags-input/3.1.1/ng-tags-input.min.css" rel="stylesheet" media="screen">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/ng-tags-input/3.1.1/ng-tags-input.bootstrap.min.css" rel="stylesheet" media="screen">
 </head>
 
 <body ng-controller="myCtrl">
 <div class="row" style="margin-top: 10px; height: 700px; max-height: 700px;">
     <div class="col-sm-6" style="border-right: 1px solid black;">
         <div class="row">
-            <label class="col-sm-8 col-sm-offset-1">Liste des Animes</label>
-            <input class="col-sm-2" ng-model="filter.name" placeholder="Rechercher">
+            <div class="col-sm-5 col-sm-offset-1">
+                <label ng-click="open=!!!open"><span class="glyphicon {{open?'glyphicon-chevron-down':'glyphicon-chevron-right'}}"></span>Liste des Animes</label>
+                <input type="text" ng-show="open" ng-model="dossier">
+                <button ng-show="open" class="btn btn-primary glyphicon glyphicon-refresh" ng-click="refresh()"></button>
+            </div>
+            <select class="col-sm-2" ng-model="filter.filter">
+                <option value="$">Tout</option>
+                <option value="name" selected="selected">Nom</option>
+                <option value="tags.name">Tag</option>
+            </select>
+            <input class="col-sm-2" ng-model="filter.value" placeholder="Rechercher">
+            <button ng-click="applyFilter()">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
+            <button ng-click="removeFilter()">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
         </div>
         <div class="row" style="padding-top: 10px;">
             <div class="col-sm-10 col-sm-offset-1">
@@ -34,29 +53,33 @@
                         </div>
                         <div ng-repeat="serie in paginator.getDisplayedRows()">
                             <div class="row" style="background-color: {{getSelectedSerie().id==serie.id?'lightgrey':'white'}}">
-                                <div class="col-sm-1" style="border: 1px solid black;" ng-click="setSelectedSerie(serie)">{{getSelectedSerie().id==serie.id?"v":">"}}</div>
+                                <div class="col-sm-1" style="border: 1px solid black;" ng-click="setSelectedSerie(serie)">
+                                    <span class="glyphicon {{getSelectedSerie().id==serie.id?'glyphicon-chevron-down':'glyphicon-chevron-right'}}"></span>
+                                </div>
                                 <div class="col-sm-5" style="border: 1px solid black; cursor:pointer;"
                                      ng-click="setSelectedSerie(serie)">
                                     <a href="">{{serie.name}}</a>
                                 </div>
                                 <div class="col-sm-5" style="border: 1px solid black;">
                                     <div class="row">
-                                        <div class="{{textBtnForm.$visible?'col-sm-12':'col-sm-9'}}">
-                                            <div class="row" style="word-break: keep-all;" editable-select="serie.tags"
-                                               e-multiple e-ng-options="t as t.name for t in tags"
-                                               onaftersave="updateSerie(serie)"
-                                               e-form="textBtnForm">
-                                                <div class="col-sm-4" ng-repeat="tag in serie.tags" style="padding: 0 2px 0 2px;">{{tag.name}}</div>
+                                        <div class="col-sm-9">
+                                            <div class="row" style="word-break: keep-all;" editable-tags-input="serie.tags" data-e-form="textBtnForm" data-e-ng-model="serie.tags" onaftersave="updateSerie(serie)" buttons="no">
+                                                <a href="" ng-click="setFilterTag(tag)" class="col-sm-4" ng-repeat="tag in serie.tags" style="padding: 0 2px 0 2px;">{{tag.name}}</a>
+                                                <editable-tags-input-auto-complete source="tags"></editable-tags-input-auto-complete>
                                             </div>
                                         </div>
-                                        <div class="col-sm-3" ng-hide="textBtnForm.$visible">
-                                            <button class="btn btn-default" ng-click="textBtnForm.$show()">edit</button>
+                                        <div ng-hide="textBtnForm.$visible" class="col-sm-3">
+                                            <button class="btn btn-default glyphicon glyphicon-pencil" ng-click="textBtnForm.$show()"></button>
+                                        </div>
+                                        <div ng-show="textBtnForm.$visible" class="col-sm-3">
+                                            <button type="button" class="btn btn-primary glyphicon glyphicon-ok" ng-disabled="textBtnForm.$waiting" ng-click="textBtnForm.$submit()"></button>
+                                            <button type="button" class="btn btn-default glyphicon glyphicon-remove" ng-disabled="textBtnForm.$waiting" ng-click="textBtnForm.$cancel()"></button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-1" style="border: 1px solid black; cursor:pointer;"
+                                <div class="col-sm-1" style="border: 1px solid black; cursor:pointer; text-align: center;"
                                      ng-click="toggleViewedSerie(serie)">
-                                    <a href="">{{serie.viewed}}</a>
+                                    <span class="glyphicon {{serie.viewed?'glyphicon-ok':'glyphicon-unchecked'}}"></span>
                                 </div>
                             </div>
                             <div ng-if="getSelectedSerie().id==serie.id" ng-repeat="e in serie.episodes | orderBy:'num'">
@@ -66,9 +89,9 @@
                                         <a href="">{{e.name}}</a>
                                     </div>
                                     <div class="col-sm-5" style="border: 1px solid black;"></div>
-                                    <div class="col-sm-1" style="border: 1px solid black; cursor:pointer;"
+                                    <div class="col-sm-1" style="border: 1px solid black; cursor:pointer; text-align: center;"
                                          ng-click="toggleViewedEpisode(e)">
-                                        <a href="">{{e.viewed}}</a>
+                                        <span class="glyphicon {{e.viewed?'glyphicon-ok':'glyphicon-unchecked'}}"></span>
                                     </div>
                                 </div>
                             </div>
@@ -78,7 +101,7 @@
             </div>
         </div>
     </div>
-    <div ng-if="getSelectedEpisode()" class="col-sm-6">
+    <div ng-if="getSelectedEpisode().id" class="col-sm-6">
         <div class="row">
             <div class="col-sm-12" style="text-align: center;"><b>{{getSelectedEpisode().name}}</b></div>
             <ng-video episodeid="getSelectedEpisode().id" class="col-sm-10 col-sm-offset-1" style="margin-top: 10px;"></ng-video>
