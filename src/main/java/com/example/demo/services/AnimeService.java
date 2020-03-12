@@ -3,15 +3,15 @@ package com.example.demo.services;
 import com.example.demo.dao.EpisodeDAO;
 import com.example.demo.dao.SerieDAO;
 import com.example.demo.dao.TagDAO;
+import com.example.demo.exception.EntityAlreadyExistsException;
+import com.example.demo.exception.EntityNotFoundException;
 import com.example.demo.models.Episode;
 import com.example.demo.models.Serie;
 import com.example.demo.models.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.io.File;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -37,7 +37,7 @@ public class AnimeService {
         return serieDAO.findAll();
     }
 
-    public Serie findSerie(Long id) {
+    public Serie findSerie(Long id) throws EntityNotFoundException {
         Serie serie = serieDAO.getOne(id);
         if (serie == null) {
             throw new EntityNotFoundException("La série numéro " + id + " n'existe pas.");
@@ -45,12 +45,12 @@ public class AnimeService {
         return serie;
     }
 
-    public List<Episode> listEpisodes(Long serieId) {
+    public List<Episode> listEpisodes(Long serieId) throws EntityNotFoundException {
         Serie serie = findSerie(serieId);
         return serie.getEpisodes();
     }
 
-    public Episode findEpisode(Long id) {
+    public Episode findEpisode(Long id) throws EntityNotFoundException {
         Episode episode = episodeDAO.getOne(id);
         if (episode == null) {
             throw new EntityNotFoundException("L'épisode numéro " + id + " n'existe pas.");
@@ -58,7 +58,7 @@ public class AnimeService {
         return episode;
     }
 
-    public Episode findEpisodeBySerieAndNum(long serieId, float num) {
+    public Episode findEpisodeBySerieAndNum(long serieId, float num) throws EntityNotFoundException {
         Map<Float, Episode> map = listEpisodes(serieId).stream().collect(Collectors.toMap(e -> e.getNum(), Function.identity()));
         Episode episode = map.get(num);
         if (episode == null) {
@@ -104,13 +104,22 @@ public class AnimeService {
         }
     }
 
-    public void update(Serie serie) {
+    public void update(Serie serie) throws EntityNotFoundException {
         findSerie(serie.getId());
         serieDAO.save(serie);
     }
 
-    public void update(Episode episode) {
+    public void update(Episode episode) throws EntityNotFoundException {
         findEpisode(episode.getId());
         episodeDAO.save(episode);
+    }
+
+    public Tag createTag(String name) throws EntityAlreadyExistsException {
+        if (tagDAO.existsByName(name)) {
+            throw new EntityAlreadyExistsException("Le tag " + name + " existe déjà.");
+        }
+        Tag tag = new Tag();
+        tag.setName(name);
+        return tagDAO.save(tag);
     }
 }
