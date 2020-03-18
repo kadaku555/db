@@ -85,6 +85,9 @@ public class AnimeService {
                         serie = serieDAO.save(serie);
                     }
                 }
+                else {
+                    serie = serieDAO.findByName(serie.getName());
+                }
                 for (File dossEpisode : dossSerie.listFiles()) {
                     try {
                         Episode episode = new Episode();
@@ -97,7 +100,7 @@ public class AnimeService {
                             episodeDAO.save(episode);
                         }
                     } catch (Exception e) {
-                        throw new IllegalArgumentException("Issue with Serie: " + dossSerie.getName() + ", Episode: " + dossEpisode.getName());
+                        throw new IllegalArgumentException("Issue with Serie: " + dossSerie.getName() + ", Episode: " + dossEpisode.getName(), e);
                     }
                 }
             }
