@@ -3,6 +3,8 @@ package com.example.demo.controllers;
 import com.example.demo.dto.EpisodeDTO;
 import com.example.demo.dto.SerieDTO;
 import com.example.demo.dto.TagDTO;
+import com.example.demo.exception.EntityAlreadyExistsException;
+import com.example.demo.exception.EntityNotFoundException;
 import com.example.demo.models.Episode;
 import com.example.demo.models.Serie;
 import com.example.demo.services.AnimeService;
@@ -12,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,7 +74,7 @@ public class AnimeController {
     }
 
     @RequestMapping(value = "/episode/{id}/video", produces = "video/mp4")
-    public FileSystemResource getvideo(@PathVariable("id") Long id) {
+    public FileSystemResource getvideo(@PathVariable("id") Long id) throws EntityNotFoundException {
         return new FileSystemResource(new File(animeService.findEpisode(id).getPath()));
     }
 
@@ -112,6 +113,18 @@ public class AnimeController {
     @RequestMapping(value = "/tags", produces = "Application/json")
     public List<TagDTO> listTags() {
         return animeService.listTags().stream().map(t -> new TagDTO(t)).collect(Collectors.toList());
+    }
+
+    @RequestMapping(value = "/tag", method = RequestMethod.POST)
+    public ResponseEntity createTag(@RequestParam("name") String name) {
+        ResponseEntity response;
+        try {
+            animeService.createTag(name);
+            response = new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (EntityAlreadyExistsException e) {
+            response = new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        return response;
     }
 
     @RequestMapping("/import")

@@ -8,34 +8,64 @@ app.controller('myCtrl', function($scope, $http) {
     $scope.series = [];
     $scope.tags = [];
     $scope.dossier = "C:/Users/julien.saillant/Downloads/Anime";
-    $scope.paginator = {actionafterinit: function(){
-        $scope.paginator.setPageSize(10);
-        $scope.paginator.setPredicate("name")}
+    $scope.newTag = "";
+    $scope.paginator = {
+        actionafterinit: function() {
+            $scope.paginator.setPageSize(10);
+            $scope.paginator.setPredicate("name")
+        }
+    };
+
+    $scope.createTag = function() {
+        var first = $scope.newTag.substring(0,1);
+        var rest = $scope.newTag.substring(1);
+        $http.post("/tag?name="+first.toUpperCase()+rest.toLowerCase()).then(
+            function(data) {
+                $scope.newTag = "";
+                $http.get("/tags").then(
+                    function(data) {
+                        $scope.tags = [];
+                        angular.forEach(data.data , function(data) {
+                            data.text=data.name;
+                            $scope.tags.push(data);
+                        });
+                    },
+                    function(error) {
+                        console.Log(error);
+                    }
+                );
+            },
+            function(error) {
+                console.log(error);
+            }
+        );
     };
 
     $scope.load = function() {
         $http.get("/series").then(
-            function(data){
-                angular.forEach(data.data , function(data){
-                    angular.forEach(data.tags , function(tag){
+            function(data) {
+                angular.forEach(data.data , function(data) {
+                    angular.forEach(data.tags , function(tag) {
                         tag.text=tag.name;
                     });
                 });
                 $scope.series = data.data;
                 $scope.paginator.applyQuery($scope.series);
             },
-            function(error){
+            function(error) {
+                console.log(error);
             }
         );
         $http.get("/tags").then(
-            function(data){
+            function(data) {
                 $scope.tags = [];
-                angular.forEach(data.data , function(data){
+                angular.forEach(data.data , function(data) {
                     data.text=data.name;
                     $scope.tags.push(data);
                 });
             },
-            function(error){
+            function(error) {
+                console.Log(error);
             }
         );
     };
@@ -58,10 +88,10 @@ app.controller('myCtrl', function($scope, $http) {
 
     $scope.setSelectedEpisode = function(episode) {
         if (selectedEpisode.id == episode.id) {
-                    selectedEpisode = {};
-                } else {
-                    selectedEpisode = episode;
-                }
+            selectedEpisode = {};
+        } else {
+            selectedEpisode = episode;
+        }
     };
 
     $scope.toggleViewedSerie = function(serie) {
@@ -108,13 +138,14 @@ app.controller('myCtrl', function($scope, $http) {
         $scope.applyFilter();
     };
 
-    $scope.refresh = function(){
+    $scope.refresh = function() {
         $http.get("import?path="+$scope.dossier).then(
-        function(data){
-            $scope.load();
-        },
-        function(error){
-        }
+            function(data) {
+                $scope.load();
+            },
+            function(error) {
+                console.log(error);
+            }
         )
     };
 
@@ -122,7 +153,7 @@ app.controller('myCtrl', function($scope, $http) {
     $scope.load();
 });
 
-app.directive("ngVideo", function(){
+app.directive("ngVideo", function() {
     return {
         restrict: 'E',
         scope: {
