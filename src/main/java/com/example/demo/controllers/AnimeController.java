@@ -15,7 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -130,5 +133,28 @@ public class AnimeController {
     @RequestMapping("/import")
     public void importFromFileSystem(@RequestParam("path") String path) {
         animeService.importFromFileSystem(path);
+    }
+
+    @RequestMapping("/h")
+    public List list() {
+        String path = "C:/Users/julien.saillant/Downloads/Anime/Overlord 2";
+        List<Map<String, Object>> res = new ArrayList<>();
+        File origin = new File(path);
+        if (!origin.isDirectory()) {
+            throw new IllegalArgumentException("Le chemin doit correspondre à un répertoire.");
+        }
+        for (File h : origin.listFiles()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", h.getName());
+            map.put("path", h.getAbsolutePath().replace("\\", "/"));
+            map.put("date", h.lastModified());
+            res.add(map);
+        }
+        return res;
+    }
+
+    @RequestMapping(value = "/h/video", produces = "video/mp4")
+    public FileSystemResource getSpecialVideo(@RequestParam("path") String path) throws EntityNotFoundException {
+        return new FileSystemResource(new File(path));
     }
 }
