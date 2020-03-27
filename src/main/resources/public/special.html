@@ -1,0 +1,30 @@
+<div class="row" style="margin-top: 10px; height: 700px; max-height: 700px;">
+    <div class="col-sm-6" style="border-right: 1px solid black;">
+
+        <div class="row" style="padding-top: 10px;">
+            <div class="col-sm-10 col-sm-offset-1">
+                <div paginator remote="paginator" items="list">
+                    <div style="clear: both;">
+                        <div class="row">
+                            <div class="col-sm-12" style="border: 1px solid black;">Nom</div>
+                        </div>
+                        <div ng-repeat="episode in paginator.getDisplayedRows()">
+                            <div class="row" style="background-color: {{getSelected().name==episode.name?'lightgrey':'white'}}">
+                                <div class="col-sm-12" style="border: 1px solid black; cursor:pointer;"
+                                     ng-click="setSelected(episode)">
+                                    <a href="">{{episode.name}}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-if="getSelected().name" class="col-sm-6">
+        <div class="row">
+            <div class="col-sm-12" style="text-align: center;"><b>{{getSelected().name}}</b></div>
+            <ng-special-video src="getSelected().path" class="col-sm-10 col-sm-offset-1" style="margin-top: 10px;"></ng-special-video>
+        </div>
+    </div>
+</div>

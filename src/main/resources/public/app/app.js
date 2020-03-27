@@ -1,6 +1,51 @@
-var app = angular.module('myApp', ["xeditable", "paginator", "ngTagsInput"]);
+var app = angular.module('myApp', ["xeditable", "paginator", "ngTagsInput", "ngRoute"]);
 
-app.controller('myCtrl', function($scope, $http) {
+app.controller('homeCtrl', function($scope, $http) {
+
+});
+
+app.controller('specialCtrl', function($scope, $http) {
+    var selected = {};
+
+    //__PUBLIC__//
+    $scope.list = [];
+    $scope.paginator = {
+        actionafterinit: function() {
+            $scope.paginator.setPageSize(10);
+            $scope.paginator.setPredicate("date")
+        }
+    };
+
+    $scope.load = function() {
+        $http.get("/h").then(
+            function(data) {
+                $scope.list = data.data;
+                $scope.paginator.applyQuery($scope.list);
+            },
+            function(error) {
+                console.log(error);
+            }
+        );
+    };
+
+    $scope.getSelected = function() {
+        return selected;
+    };
+
+    $scope.setSelected = function(episode) {
+        if (selected.name == episode.name) {
+            selected = {};
+        } else {
+            selected = episode;
+        }
+    };
+
+    //__RUNTIME__//
+    $scope.load();
+
+});
+
+app.controller('mainCtrl', function($scope, $http) {
     var selectedSerie = {};
     var selectedEpisode = {};
 
@@ -162,6 +207,30 @@ app.directive("ngVideo", function() {
         template: "<video controls='controls' preload=auto width=100% src='/episode/{{episodeid}}/video'>"
     }
 });
+
+app.directive("ngSpecialVideo", function() {
+    return {
+        restrict: 'E',
+        scope: {
+          src: '='
+        },
+        template: "<video controls='controls' preload=auto width=100% src='/h/video?path={{src}}'>"
+    }
+});
+
+app.config(['$routeProvider',
+     function($routeProvider) {
+       $routeProvider
+         .when('/', {
+           templateUrl: 'main.html',
+           controller: 'mainCtrl'
+         })
+         .when('/special', {
+           templateUrl: 'special.html',
+           controller: 'specialCtrl'
+         });
+
+   }])
 
 app.run(['editableOptions', function(editableOptions) {
     editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs4', 'bs2', 'default'
