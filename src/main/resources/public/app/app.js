@@ -1,7 +1,199 @@
-var app = angular.module('myApp', ["xeditable", "paginator", "ngTagsInput", "ngRoute"]);
+var app = angular.module('myApp', ["xeditable", "paginator", "ngTagsInput", "ngRoute", "ui.bootstrap"]);
 
 app.controller('homeCtrl', function($scope, $http) {
 
+});
+
+app.controller('flowerCtrl', function($scope, $http, $timeout, $uibModal) {
+
+    //__PRIVATE__//
+
+    var fleurs = [];
+    var allowRefresh = true;
+
+    var load = function(){
+            $http.get("/tickets").then(
+                function(data) {
+                    $scope.newTicket = [];
+                    $scope.todoTicket = [];
+                    $scope.doneTicket = [];
+                    $scope.releasedTicket = [];
+                    angular.forEach(data.data, function(ticket) {
+                        switch(ticket.status) {
+                            case "NEW":
+                                $scope.newTicket.push(ticket);
+                                break;
+                            case "TODO":
+                                $scope.todoTicket.push(ticket);
+                                break;
+                            case "DONE":
+                                $scope.doneTicket.push(ticket);
+                                break;
+                            case "RELEASED":
+                                $scope.releasedTicket.push(ticket);
+                                break;
+                        }
+                    })
+                },
+                function(error) {
+                    console.log(error);
+                }
+            );
+        };
+
+    //__PUBLIC__//
+
+    $scope.newTicket = [];
+    $scope.todoTicket = [];
+    $scope.doneTicket = [];
+    $scope.releasedTicket = [];
+
+    $scope.nextStatus = function(id) {
+        $http.put("/ticket/"+id+"/next").then(
+            function(data) {
+                load();
+            },
+            function(error) {
+                console.log(error);
+            }
+        )
+    };
+
+    $scope.prevStatus = function(id) {
+        $http.put("/ticket/"+id+"/prev").then(
+            function(data) {
+                load();
+            },
+            function(error) {
+                console.log(error);
+            }
+        )
+    };
+
+    $scope.refresh = function() {
+        if (allowRefresh) {
+            load();
+            $timeout($scope.refresh, 30000);
+        }
+    }
+
+    $scope.create = function() {
+        $scope.open({status: "NEW"}, "Nouvelle commande").result.then(
+            function (ticket) {
+                $http.post("/ticket", ticket).then(
+                    function() {
+                        allowRefresh = true;
+                        $scope.refresh();
+                    },
+                    function(error) {
+                        console.log(error);
+                        alert(error);
+                        allowRefresh = true;
+                        $scope.refresh();
+                    }
+                )
+            },
+            function () {
+                console.log('Modal dismissed at: ' + new Date());
+            }
+        );
+    };
+
+    $scope.update = function(id) {
+        $http.get("ticket/"+id).then(
+            function(data) {
+                $scope.open(data.data, "Commande No: "+id).result.then(
+                    function (ticket) {
+                        $http.put("/ticket/"+id, ticket).then(
+                            function() {
+                                allowRefresh = true;
+                                $scope.refresh();
+                            },
+                            function(error) {
+                                console.log(error);
+                                alert(error);
+                                allowRefresh = true;
+                                $scope.refresh();
+                            }
+                        )
+                    },
+                    function () {
+                        console.log('Modal dismissed at: ' + new Date());
+                    }
+                );
+            },
+            function(error) {
+                console.log(error);
+                alert(error);
+            }
+        );
+    };
+
+    $scope.delete = function(id) {
+        if (confirm("Voulez-vous supprimer le ticket "+id+"?")) {
+            $http.delete("ticket/"+id).then(
+                function(data) {
+                    load();
+                },
+                function(error) {
+                    console.log(error);
+                    alert(error);
+                }
+            );
+        }
+    };
+
+    $scope.open = function (ticket, title) {
+        allowRefresh = false;
+        var modalInstance = $uibModal.open({
+          templateUrl: 'ticket.html',
+          controller: 'ModalInstanceCtrl',
+          resolve: {
+            ticket: function () {
+                return ticket;
+            },
+            title: function() {
+                return title;
+            },
+            fleurs: function() {
+                return fleurs;
+            }
+          }
+        });
+        return modalInstance;
+    };
+
+    //__RUNTIME__//
+
+    $scope.refresh();
+
+    $http.get("/fleurs").then(
+        function(data) {
+            fleurs = data.data;
+        },
+        function(error) {
+            console.log(error);
+            alert(error);
+        }
+    );
+});
+
+app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, ticket, title, fleurs) {
+    $scope.ticket = ticket;
+    $scope.title = title;
+    $scope.fleurs = fleurs;
+
+    $scope.addDetail = function() {
+        $scope.ticket.details.push({quantite: 0});
+    };
+
+    $scope.ok = function () {
+        $uibModalInstance.close($scope.ticket);
+    };
+
+    $scope.cancel = function () {
+        $uibModalInstance.dismiss('cancel');
+    };
 });
 
 app.controller('specialCtrl', function($scope, $http) {
@@ -228,6 +420,10 @@ app.config(['$routeProvider',
          .when('/special', {
            templateUrl: 'special.html',
            controller: 'specialCtrl'
+         })
+         .when('/flower', {
+           templateUrl: 'flower.html',
+           controller: 'flowerCtrl'
          });
 
    }])

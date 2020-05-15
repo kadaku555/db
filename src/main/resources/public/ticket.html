@@ -1,0 +1,36 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">{{title}}</h3>
+</div>
+<div class="modal-body" id="modal-body">
+    <div class="row">
+        <div class="col-xs-3">Contact:</div>
+        <input class="col-xs-4" ng-model="ticket.contact">
+    </div>
+    <div class="row">
+        <div class="col-xs-3">Dodo code:</div>
+        <input class="col-xs-4" ng-model="ticket.dodoCode">
+    </div>
+    <div class="row">
+        <div class="col-xs-3">Commentaire:</div>
+        <textarea class="col-xs-8" ng-model="ticket.commentaire"></textarea>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">Detail:</div>
+    </div>
+    <div class="row" ng-repeat="detail in ticket.details">
+        <select class="col-xs-offset-3 col-xs-4" ng-model="detail.fleur">
+            <option ng-repeat="fleur in fleurs" value="{{fleur.id}}">{{fleur.affichage}}</option>
+        </select>
+        <input class="col-xs-2" type="number" ng-model="detail.quantite" required>
+        <button class="btn btn-danger glyphicon glyphicon-remove" ng-click="ticket.details.splice($index, 1)"></button>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <button class="btn btn-success glyphicon glyphicon-plus" ng-click="addDetail()"></button>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok()">Save</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>
