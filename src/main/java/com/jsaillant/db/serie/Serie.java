@@ -1,27 +1,33 @@
-package com.example.demo.models;
+package com.jsaillant.db.serie;
+
+import com.jsaillant.db.episode.Episode;
+import com.jsaillant.db.tag.Tag;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(name = "serie")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "TYPE")
 public class Serie {
 
     @Id
     @GeneratedValue
-    private Long id;
+    protected Long id;
 
-    private String name = "";
+    protected String name = "";
 
-    private boolean viewed = false;
+    protected String path = "";
 
     @ManyToMany
     @JoinTable(name = "serie_tag",
             joinColumns = {@JoinColumn(name = "serie_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")})
-    private List<Tag> tags;
+    protected List<Tag> tags;
 
     @OneToMany(mappedBy = "serie")
-    private List<Episode> episodes;
+    protected List<Episode> episodes;
 
     public Long getId() {
         return id;
@@ -39,14 +45,6 @@ public class Serie {
         this.name = name;
     }
 
-    public boolean isViewed() {
-        return viewed;
-    }
-
-    public void setViewed(boolean viewed) {
-        this.viewed = viewed;
-    }
-
     public List<Tag> getTags() {
         return tags;
     }
@@ -61,5 +59,13 @@ public class Serie {
 
     public void setEpisodes(List<Episode> episodes) {
         this.episodes = episodes;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

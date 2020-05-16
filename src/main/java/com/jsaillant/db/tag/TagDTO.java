@@ -1,6 +1,4 @@
-package com.example.demo.dto;
-
-import com.example.demo.models.Tag;
+package com.jsaillant.db.tag;
 
 public class TagDTO {
 

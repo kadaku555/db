@@ -1,15 +1,12 @@
-package com.example.demo.models;
+package com.jsaillant.db.episode;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.jsaillant.db.serie.Serie;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.io.File;
 
 @Entity
+@Table(name = "episode")
 public class Episode {
 
     @Id
@@ -24,8 +21,6 @@ public class Episode {
     private Serie serie;
 
     private boolean viewed = false;
-
-    private String path = "";
 
     public Long getId() {
         return id;
@@ -68,10 +63,6 @@ public class Episode {
     }
 
     public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
+        return getSerie().getPath() + File.separator + getSerie().getName() + File.separator + getName() + ".mp4";
     }
 }

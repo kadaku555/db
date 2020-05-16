@@ -1,6 +1,4 @@
-package com.example.demo.dto;
-
-import com.example.demo.models.Episode;
+package com.jsaillant.db.episode;
 
 public class EpisodeDTO {
 

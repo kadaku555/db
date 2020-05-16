@@ -1,12 +1,11 @@
-package com.example.demo.dao;
+package com.jsaillant.db.tag;
 
-import com.example.demo.models.Serie;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SerieDAO extends JpaRepository<Serie, Long> {
+public interface TagDAO extends JpaRepository<Tag, Long> {
     boolean existsByName(String name);
 
-    Serie findByName(String s);
+    Tag findByName(String name);
 }

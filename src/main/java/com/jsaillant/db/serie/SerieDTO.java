@@ -1,6 +1,7 @@
-package com.example.demo.dto;
+package com.jsaillant.db.serie;
 
-import com.example.demo.models.Serie;
+import com.jsaillant.db.episode.EpisodeDTO;
+import com.jsaillant.db.tag.TagDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,9 +25,9 @@ public class SerieDTO {
     public SerieDTO(Serie serie) {
         id = serie.getId();
         name = serie.getName();
-        viewed = serie.isViewed();
         tags = serie.getTags().stream().map(t -> new TagDTO(t)).collect(Collectors.toList());
         episodes = serie.getEpisodes().stream().map(e -> new EpisodeDTO(e)).collect(Collectors.toList());
+        viewed = episodes.stream().allMatch(e -> e.isViewed());
     }
 
     public Long getId() {
@@ -73,7 +74,6 @@ public class SerieDTO {
         Serie serie = new Serie();
         serie.setName(name);
         serie.setTags(tags.stream().map(t -> t.toModel()).collect(Collectors.toList()));
-        serie.setViewed(viewed);
         return serie;
     }
 }

@@ -1,10 +1,10 @@
-package com.example.demo.dao;
+package com.jsaillant.db.episode;
 
-import com.example.demo.models.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TagDAO extends JpaRepository<Tag, Long> {
+public interface EpisodeDAO extends JpaRepository<Episode, Long> {
     boolean existsByName(String name);
+
 }

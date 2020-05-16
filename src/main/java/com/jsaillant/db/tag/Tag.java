@@ -1,4 +1,6 @@
-package com.example.demo.models;
+package com.jsaillant.db.tag;
+
+import com.jsaillant.db.serie.Serie;
 
 import javax.persistence.*;
 import java.util.List;

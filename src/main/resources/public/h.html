@@ -1,4 +1,4 @@
-<div class="row" style="margin-top: 10px; height: 700px; max-height: 700px;">
+<div class="row" style="margin-top: 10px;">
     <div class="col-sm-6" style="border-right: 1px solid black;">
 
         <div class="row" style="padding-top: 10px;">
@@ -25,6 +25,11 @@
         <div class="row">
             <div class="col-sm-12" style="text-align: center;"><b>{{getSelected().name}}</b></div>
             <ng-special-video src="getSelected().path" class="col-sm-10 col-sm-offset-1" style="margin-top: 10px;"></ng-special-video>
+        </div>
+        <div class="row">
+            <input type="text" ng-model="dest">
+            <input type="text" ng-model="as">
+            <button class="btn btn-primary" ng-click="move(dest, as)">Move</button>
         </div>
     </div>
 </div>
