@@ -4,20 +4,21 @@ app.controller('homeCtrl', function($scope, $http) {
 
 });
 
-app.controller('specialCtrl', function($scope, $http) {
+app.controller('hCtrl', function($scope, $http, $routeParams) {
     var selected = {};
 
     //__PUBLIC__//
+    $scope.params = $routeParams;
     $scope.list = [];
     $scope.paginator = {
         actionafterinit: function() {
             $scope.paginator.setPageSize(10);
-            $scope.paginator.setPredicate("date")
+            $scope.paginator.setPredicate("name")
         }
     };
 
     $scope.load = function() {
-        $http.get("/h").then(
+        $http.get("/h"+($scope.params.folder?"?folder="+$scope.params.folder:"")).then(
             function(data) {
                 $scope.list = data.data;
                 $scope.paginator.applyQuery($scope.list);
@@ -40,19 +41,32 @@ app.controller('specialCtrl', function($scope, $http) {
         }
     };
 
+    $scope.move = function(dest, as) {
+        if (selected.name) {
+            $http.put("/h/moveto/"+dest+"/as/"+as+"?path="+selected.path).then(
+            function() {
+                selected = {};
+                $scope.load();
+            },
+            function(error) {
+                console.log(error);
+            });
+        }
+    };
+
     //__RUNTIME__//
     $scope.load();
 
 });
 
-app.controller('mainCtrl', function($scope, $http) {
+app.controller('mainCtrl', function($scope, $http, base, dossier) {
     var selectedSerie = {};
     var selectedEpisode = {};
 
     $scope.filter = {filter:"name", value:"", strict: false};
     $scope.series = [];
     $scope.tags = [];
-    $scope.dossier = "C:/Users/julien.saillant/Downloads/Anime";
+    $scope.dossier = dossier;
     $scope.newTag = "";
     $scope.paginator = {
         actionafterinit: function() {
@@ -67,7 +81,7 @@ app.controller('mainCtrl', function($scope, $http) {
         $http.post("/tag?name="+first.toUpperCase()+rest.toLowerCase()).then(
             function(data) {
                 $scope.newTag = "";
-                $http.get("/tags").then(
+                $http.get(base+"/tags").then(
                     function(data) {
                         $scope.tags = [];
                         angular.forEach(data.data , function(data) {
@@ -87,9 +101,10 @@ app.controller('mainCtrl', function($scope, $http) {
     };
 
     $scope.load = function() {
-        $http.get("/series").then(
+        $http.get(base+"/series").then(
             function(data) {
                 angular.forEach(data.data , function(data) {
+                    if (data.episodes.length == 0) {console.log(data);}
                     angular.forEach(data.tags , function(tag) {
                         tag.text=tag.name;
                     });
@@ -139,18 +154,6 @@ app.controller('mainCtrl', function($scope, $http) {
         }
     };
 
-    $scope.toggleViewedSerie = function(serie) {
-        serie.viewed = !serie.viewed;
-        $http.put("/serie/"+serie.id, serie).then(
-            function(data) {
-                $scope.load();
-            },
-            function(error) {
-                console.log(error);
-            }
-        )
-    };
-
     $scope.toggleViewedEpisode = function(episode) {
         episode.viewed = !episode.viewed;
         $http.put("/episode/"+episode.id, episode).then(
@@ -164,7 +167,7 @@ app.controller('mainCtrl', function($scope, $http) {
     };
 
     $scope.updateSerie = function(serie) {
-        return $http.put('/serie/'+serie.id, serie);
+        return $http.put(base+"/serie/"+serie.id, serie);
     };
 
     $scope.setFilterTag = function(tag) {
@@ -184,13 +187,35 @@ app.controller('mainCtrl', function($scope, $http) {
     };
 
     $scope.refresh = function() {
-        $http.get("import?path="+$scope.dossier).then(
+        $http.get(base+"/import?path="+$scope.dossier).then(
             function(data) {
                 $scope.load();
             },
             function(error) {
                 console.log(error);
             }
+        )
+    };
+
+    $scope.deleteSerie = function(serie) {
+        $http.delete(base+"/serie/"+serie.id).then(
+             function(data) {
+                 $scope.load();
+             },
+             function(error) {
+                 console.log(error);
+             }
+        )
+    };
+
+    $scope.deleteEpisode = function(episode) {
+        $http.delete("/episode/"+episode.id).then(
+             function(data) {
+                 $scope.load();
+             },
+             function(error) {
+                 console.log(error);
+             }
         )
     };
 
@@ -219,18 +244,38 @@ app.directive("ngSpecialVideo", function() {
 });
 
 app.config(['$routeProvider',
-     function($routeProvider) {
-       $routeProvider
-         .when('/', {
-           templateUrl: 'main.html',
-           controller: 'mainCtrl'
-         })
-         .when('/special', {
-           templateUrl: 'special.html',
-           controller: 'specialCtrl'
-         });
-
-   }])
+    function($routeProvider) {
+        $routeProvider
+        .when('/', {
+            templateUrl: 'main.html',
+            controller: 'mainCtrl',
+            resolve: {
+                base: function(){return "/normal";},
+                dossier: function(){return "F:/Anime";}
+            }
+        })
+        .when('/super', {
+            templateUrl: 'main.html',
+            controller: 'mainCtrl',
+            resolve: {
+                base: function(){return "/super";},
+                dossier: function(){return "F:/perso/Ecchi";}
+            }
+        })
+        .when('/special', {
+            templateUrl: 'main.html',
+            controller: 'mainCtrl',
+            resolve: {
+                base: function(){return "/special";},
+                dossier: function(){return "F:/portable/samsung/video";}
+            }
+        })
+        .when('/h', {
+            templateUrl: 'h.html',
+            controller: 'hCtrl'
+        });
+    }
+]);
 
 app.run(['editableOptions', function(editableOptions) {
     editableOptions.theme = 'bs3'; // bootstrap3 theme. Can be also 'bs4', 'bs2', 'default'

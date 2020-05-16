@@ -1,5 +1,5 @@
-<div class="row" style="margin-top: 10px; height: 700px; max-height: 700px;">
-    <div class="col-sm-6" style="border-right: 1px solid black;">
+<div class="row" style="margin-top: 10px;">
+    <div class="col-md-6 col-xs-12" style="border-right: 1px solid black;">
         <div class="row">
             <div class="col-sm-5 col-sm-offset-1">
                 <label ng-click="open=!!!open">Liste des Animes</label>
@@ -26,54 +26,55 @@
             </button>
         </div>
         <div class="row" style="padding-top: 10px;">
-            <div class="col-sm-10 col-sm-offset-1">
+            <div class="col-xs-10 col-xs-offset-1">
                 <div paginator remote="paginator" items="series">
                     <div style="clear: both;">
                         <div class="row">
-                            <div class="col-sm-1" style="border: 1px solid black;"></div>
-                            <div class="col-sm-5" style="border: 1px solid black;">Nom</div>
-                            <div class="col-sm-5" style="border: 1px solid black;">Tags</div>
-                            <div class="col-sm-1" style="border: 1px solid black;">Vue</div>
+                            <div class="col-xs-1" style="border: 1px solid black;"></div>
+                            <div class="col-xs-5" style="border: 1px solid black;">Nom</div>
+                            <div class="col-xs-5" style="border: 1px solid black;">Tags</div>
+                            <div class="col-xs-1" style="border: 1px solid black;">Vue</div>
                         </div>
                         <div ng-repeat="serie in paginator.getDisplayedRows()">
                             <div class="row" style="background-color: {{getSelectedSerie().id==serie.id?'lightgrey':'white'}}">
-                                <div class="col-sm-1" style="border: 1px solid black;" ng-click="setSelectedSerie(serie)">
+                                <div class="col-xs-1" style="border: 1px solid black;" ng-click="setSelectedSerie(serie)">
                                     <span class="glyphicon {{getSelectedSerie().id==serie.id?'glyphicon-chevron-down':'glyphicon-chevron-right'}}"></span>
                                 </div>
-                                <div class="col-sm-5" style="border: 1px solid black; cursor:pointer;"
+                                <div class="col-xs-5" style="border: 1px solid black; cursor:pointer;"
                                      ng-click="setSelectedSerie(serie)">
                                     <a href="">{{serie.name}}</a>
+                                    <button ng-show="open" class="glyphicon glyphicon-remove btn btn-danger" ng-click="deleteSerie(serie)"></button>
                                 </div>
-                                <div class="col-sm-5" style="border: 1px solid black;">
+                                <div class="col-xs-5" style="border: 1px solid black;">
                                     <div class="row">
-                                        <div class="col-sm-9">
+                                        <div class="col-xs-9">
                                             <div class="row" style="word-break: keep-all;" editable-tags-input="serie.tags" data-e-form="textBtnForm" data-e-ng-model="serie.tags" onaftersave="updateSerie(serie)" buttons="no">
-                                                <a href="" ng-click="setFilterTag(tag)" class="col-sm-4" ng-repeat="tag in serie.tags" style="padding: 0 2px 0 2px;">{{tag.name}}</a>
+                                                <a href="" ng-click="setFilterTag(tag)" class="col-lg-4 col-md-6 col-sm-4 col-xs-6" ng-repeat="tag in serie.tags | orderBy: 'name'" style="padding: 0 2px 0 2px;">{{tag.name}}</a>
                                                 <editable-tags-input-auto-complete source="tags | orderBy:'text' | filter:$query"></editable-tags-input-auto-complete>
                                             </div>
                                         </div>
-                                        <div ng-hide="textBtnForm.$visible" class="col-sm-3">
+                                        <div ng-hide="textBtnForm.$visible" class="col-xs-3">
                                             <button class="btn btn-default glyphicon glyphicon-pencil" ng-click="textBtnForm.$show()"></button>
                                         </div>
-                                        <div ng-show="textBtnForm.$visible" class="col-sm-3">
+                                        <div ng-show="textBtnForm.$visible" class="col-xs-3">
                                             <button type="button" class="btn btn-primary glyphicon glyphicon-ok" ng-disabled="textBtnForm.$waiting" ng-click="textBtnForm.$submit()"></button>
                                             <button type="button" class="btn btn-default glyphicon glyphicon-remove" ng-disabled="textBtnForm.$waiting" ng-click="textBtnForm.$cancel()"></button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-1" style="border: 1px solid black; cursor:pointer; text-align: center;"
-                                     ng-click="toggleViewedSerie(serie)">
+                                <div class="col-xs-1" style="border: 1px solid black; cursor:pointer; text-align: center;">
                                     <span class="glyphicon {{serie.viewed?'glyphicon-ok':'glyphicon-unchecked'}}"></span>
                                 </div>
                             </div>
                             <div ng-if="getSelectedSerie().id==serie.id" ng-repeat="e in serie.episodes | orderBy:'num'">
-                                <div class="row" style="background-color: {{getSelectedEpisode().id==e.id?'yellow':'lightyellow'}}">
-                                    <div class="col-sm-1" style="border: 1px solid black;"></div>
-                                    <div class="col-sm-5" style="border: 1px solid black; cursor:pointer;" ng-click="setSelectedEpisode(e)">
+                                <div class="row highlight" style="background-color: {{getSelectedEpisode().id==e.id?'yellow':'lightyellow'}}">
+                                    <div class="col-xs-1" style="border: 1px solid black;">{{e.num}}</div>
+                                    <div class="col-xs-5" style="border: 1px solid black; cursor:pointer;" ng-click="setSelectedEpisode(e)">
                                         <a href="">{{e.name}}</a>
+                                        <button ng-show="open" class="glyphicon glyphicon-remove btn btn-danger" ng-click="deleteEpisode(e)"></button>
                                     </div>
-                                    <div class="col-sm-5" style="border: 1px solid black;"></div>
-                                    <div class="col-sm-1" style="border: 1px solid black; cursor:pointer; text-align: center;"
+                                    <div class="col-xs-5" style="border: 1px solid black;"></div>
+                                    <div class="col-xs-1" style="border: 1px solid black; cursor:pointer; text-align: center;"
                                          ng-click="toggleViewedEpisode(e)">
                                         <span class="glyphicon {{e.viewed?'glyphicon-ok':'glyphicon-unchecked'}}"></span>
                                     </div>
@@ -85,10 +86,10 @@
             </div>
         </div>
     </div>
-    <div ng-if="getSelectedEpisode().id" class="col-sm-6">
+    <div ng-if="getSelectedEpisode().id" class="col-md-6 col-xs-12">
         <div class="row">
-            <div class="col-sm-12" style="text-align: center;"><b>{{getSelectedEpisode().name}}</b></div>
-            <ng-video episodeid="getSelectedEpisode().id" class="col-sm-10 col-sm-offset-1" style="margin-top: 10px;"></ng-video>
+            <div class="col-xs-12" style="text-align: center;"><b>{{getSelectedEpisode().name}}</b></div>
+            <ng-video episodeid="getSelectedEpisode().id" class="col-xs-10 col-xs-offset-1" style="margin-top: 10px;"></ng-video>
         </div>
     </div>
 </div>
