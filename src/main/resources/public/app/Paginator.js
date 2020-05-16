@@ -1,5 +1,5 @@
-var paginator = angular.module('paginator', ['myDebounce', 'keypress']);
-paginator.directive('paginator', function($debounce, filterFilter, orderByFilter) {
+var paginator = angular.module('paginator', []);
+paginator.directive('paginator', function(filterFilter, orderByFilter) {
 	var pageSizeLabel = "Page size";
 	return {
 		priority : 0,
@@ -165,7 +165,7 @@ paginator.directive('paginator', function($debounce, filterFilter, orderByFilter
 							filter = newValue;
 							forceFilterRows = false;
 							filterBypass = null;
-							$debounce(scope.remote.applyQuery,	100);
+//							$debounce(scope.remote.applyQuery,	100);
 						}
 					}, true);
 					
