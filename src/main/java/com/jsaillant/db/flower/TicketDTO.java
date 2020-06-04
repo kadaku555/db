@@ -1,8 +1,9 @@
-package com.example.demo.dto.flower;
+package com.jsaillant.db.flower;
 
-import com.example.demo.models.flower.Detail;
-import com.example.demo.models.flower.Status;
-import com.example.demo.models.flower.Ticket;
+import com.jsaillant.db.flower.Detail;
+import com.jsaillant.db.flower.DetailDTO;
+import com.jsaillant.db.flower.Status;
+import com.jsaillant.db.flower.Ticket;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 

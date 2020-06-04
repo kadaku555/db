@@ -1,4 +1,4 @@
-package com.example.demo.models.flower;
+package com.jsaillant.db.flower;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

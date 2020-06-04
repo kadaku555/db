@@ -1,5 +1,5 @@
-<div class="row" style="margin-top: 10px;">
-    <div class="col-xs-2">
+<div class="row" style="margin-top: 10px; margin-left: 0; margin-right: 0;">
+    <div class="col-xs-1">
         <div class="row">
             <div class="col-xs-12">
                 <button class="btn btn-primary" ng-click="create()">Nouveau</button>
@@ -8,8 +8,8 @@
     </div>
     <div class="col-xs-2" style="border: 1px solid black;">
         <div class="row">
-            <div class="col-xs-12" style="border: 1px solid black; text-align: center;">NEW</div>
-            <div ng-repeat="ticket in newTicket" class="col-xs-12" style="background-color: lightyellow; border: 1px solid black;">
+            <div class="col-xs-12" style="border: 1px solid black; text-align: center;"><b>NEW</b></div>
+            <div ng-repeat="ticket in newTicket | orderBy: 'id'" class="col-xs-12" style="background-color: lightyellow; border: 1px solid black;">
                 <div class="row">
                     <div class="col-xs-10" ng-click="update(ticket.id)">
                         <div class="row">No: {{ticket.id}}</div>
@@ -27,8 +27,8 @@
     </div>
     <div class="col-xs-2" style="border: 1px solid black;">
         <div class="row">
-            <div class="col-xs-12" style="border: 1px solid black; text-align: center;">TO DO</div>
-            <div ng-repeat="ticket in todoTicket" class="col-xs-12" style="background-color: lightyellow; border: 1px solid black;">
+            <div class="col-xs-12" style="border: 1px solid black; text-align: center;"><b>TO DO</b></div>
+            <div ng-repeat="ticket in todoTicket | orderBy: 'id'" class="col-xs-12" style="background-color: lightyellow; border: 1px solid black;">
                 <div class="row">
                     <div class="col-xs-10" ng-click="update(ticket.id)">
                         <div class="row">No: {{ticket.id}}</div>
@@ -49,8 +49,8 @@
     </div>
     <div class="col-xs-2" style="border: 1px solid black;">
         <div class="row">
-            <div class="col-xs-12" style="border: 1px solid black; text-align: center;">DONE</div>
-            <div ng-repeat="ticket in doneTicket" class="col-xs-12" style="background-color: lightyellow; border: 1px solid black;">
+            <div class="col-xs-12" style="border: 1px solid black; text-align: center;"><b>DONE</b></div>
+            <div ng-repeat="ticket in doneTicket | orderBy: 'id'" class="col-xs-12" style="background-color: lightyellow; border: 1px solid black;">
                 <div class="row">
                     <div class="col-xs-10" ng-click="update(ticket.id)">
                         <div class="row">No: {{ticket.id}}</div>
@@ -71,8 +71,8 @@
     </div>
     <div class="col-xs-2" style="border: 1px solid black;">
         <div class="row">
-            <div class="col-xs-12" style="border: 1px solid black; text-align: center;">RELEASED</div>
-            <div ng-repeat="ticket in releasedTicket" class="col-xs-12" style="background-color: lightyellow; border: 1px solid black;">
+            <div class="col-xs-12" style="border: 1px solid black; text-align: center;"><b>BAG</b></div>
+            <div ng-repeat="ticket in bagTicket | orderBy: 'id'" class="col-xs-12" style="background-color: lightyellow; border: 1px solid black;">
                 <div class="row">
                     <div class="col-xs-10" ng-click="update(ticket.id)">
                         <div class="row">No: {{ticket.id}}</div>
@@ -84,8 +84,40 @@
                     <div class="col-xs-6" style="text-align: center;">
                         <a href="" ng-click="prevStatus(ticket.id)">Prev</a>
                     </div>
+                    <div class="col-xs-6" style="text-align: center;">
+                        <a href="" ng-click="nextStatus(ticket.id)">Next</a>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="col-xs-2" style="border: 1px solid black;">
+        <div class="row">
+            <div class="col-xs-12" style="border: 1px solid black; text-align: center;"><b>RELEASED</b></div>
+            <div ng-repeat="ticket in releasedTicket | orderBy: 'id'" class="col-xs-12" style="background-color: lightyellow; border: 1px solid black;">
+                <div class="row">
+                    <div class="col-xs-10" ng-click="update(ticket.id)">
+                        <div class="row">No: {{ticket.id}}</div>
+                        <div class="row">{{ticket.contact}}</div>
+                    </div>
+                    <div class="col-xs-1 glyphicon glyphicon-remove" style="color: darkred;" ng-click="delete(ticket.id)"></div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6" style="text-align: center;">
+                        <a href="" ng-click="prevStatus(ticket.id)">Prev</a>
+                    </div>
+                    <div class="col-xs-6" style="text-align: center;">
+                        <a href="" ng-click="nextStatus(ticket.id)">Archiver</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-1">
+        <div class="row">Stock</div>
+        <div class="row" ng-repeat="fleur in fleurs | orderBy: 'id'" ng-style="fleur.stock<=0?{'color':'red'}:{}">
+            <div class="col-xs-9">{{fleur.affichage}}</div>
+            <div class="col-xs-1">{{fleur.stock || 0}}</div>
         </div>
     </div>
 </div>

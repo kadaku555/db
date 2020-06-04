@@ -11,15 +11,32 @@
         <input class="col-xs-4" ng-model="ticket.dodoCode">
     </div>
     <div class="row">
+        <div class="col-xs-3">Statut:</div>
+        <select class="col-xs-4" ng-model="ticket.status">
+            <option value="NEW">NEW</option>
+            <option value="TODO">TODO</option>
+            <option value="DONE">DONE</option>
+            <option value="BAG">BAG</option>
+            <option value="RELEASED">RELEASED</option>
+        </select>
+    </div>
+    <div class="row">
         <div class="col-xs-3">Commentaire:</div>
         <textarea class="col-xs-8" ng-model="ticket.commentaire"></textarea>
+    </div>
+    <div class="row">
+        <div class="col-xs-3">Prix:</div>
+    </div>
+    <div class="row">
+        <div class="col-xs-offset-3 col-xs-3">{{getTotalBell() | number : 0}} Bell</div>
+        <div class="col-xs-3">{{getTotalTnm() | number : 0}} TNM</div>
     </div>
     <div class="row">
         <div class="col-xs-12">Detail:</div>
     </div>
     <div class="row" ng-repeat="detail in ticket.details">
         <select class="col-xs-offset-3 col-xs-4" ng-model="detail.fleur">
-            <option ng-repeat="fleur in fleurs" value="{{fleur.id}}">{{fleur.affichage}}</option>
+            <option ng-repeat="fleur in fleurs | orderBy: 'id'" value="{{fleur.id}}">{{fleur.affichage}}</option>
         </select>
         <input class="col-xs-2" type="number" ng-model="detail.quantite" required>
         <button class="btn btn-danger glyphicon glyphicon-remove" ng-click="ticket.details.splice($index, 1)"></button>

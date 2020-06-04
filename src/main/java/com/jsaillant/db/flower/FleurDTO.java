@@ -1,6 +1,4 @@
-package com.example.demo.dto.flower;
-
-import com.example.demo.models.flower.Fleur;
+package com.jsaillant.db.flower;
 
 public class FleurDTO {
 
@@ -14,9 +12,11 @@ public class FleurDTO {
 
     public Integer clochette;
 
-    public Integer tmn;
+    public Double tmn;
 
     public String commentaire;
+
+    public Integer stock;
 
     public FleurDTO() {
 
@@ -30,6 +30,7 @@ public class FleurDTO {
         this.clochette = pModel.clochette;
         this.tmn = pModel.tmn;
         this.commentaire = pModel.commentaire;
+        this.stock = pModel.stock;
     }
 
     public Fleur toModel() {
@@ -40,6 +41,7 @@ public class FleurDTO {
         fleur.clochette = this.clochette;
         fleur.tmn = this.tmn;
         fleur.commentaire = this.commentaire;
+        fleur.stock = this.stock;
         return fleur;
     }
 }

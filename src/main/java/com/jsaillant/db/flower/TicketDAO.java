@@ -1,6 +1,6 @@
-package com.example.demo.dao.flower;
+package com.jsaillant.db.flower;
 
-import com.example.demo.models.flower.Ticket;
+import com.jsaillant.db.flower.Ticket;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

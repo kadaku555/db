@@ -1,20 +1,12 @@
-package com.example.demo.services.flower;
+package com.jsaillant.db.flower;
 
-import com.example.demo.dao.flower.DetailDAO;
-import com.example.demo.dao.flower.FleurDAO;
-import com.example.demo.dao.flower.TicketDAO;
-import com.example.demo.exception.EntityNotAllowedException;
-import com.example.demo.exception.EntityNotFoundException;
-import com.example.demo.models.flower.Detail;
-import com.example.demo.models.flower.Fleur;
-import com.example.demo.models.flower.Status;
-import com.example.demo.models.flower.Ticket;
+import com.jsaillant.db.exception.EntityNotAllowedException;
+import com.jsaillant.db.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 @Service
@@ -49,6 +41,7 @@ public class TicketService {
         modelFromDB.contact = pModel.contact;
         modelFromDB.dodoCode = pModel.dodoCode;
         modelFromDB.commentaire = pModel.commentaire;
+        applyIfStatusChange(modelFromDB, pModel);
         Ticket savedModel = ticketDAO.save(modelFromDB);
         detailDAO.deleteAll(modelFromDB.details);
         List<Detail> details = pModel.details;
@@ -62,6 +55,24 @@ public class TicketService {
         return savedModel;
     }
 
+    private void applyIfStatusChange(final Ticket pModelFromDB, final Ticket pModel) {
+        if (pModelFromDB.status != pModel.status) {
+            if (pModel.status == Status.RELEASED) {
+                for(Detail detail : pModelFromDB.details) {
+                    detail.fleur.stock = detail.fleur.stock - detail.quantite;
+                    fleurDAO.save(detail.fleur);
+                }
+            }
+            if (pModelFromDB.status == Status.RELEASED) {
+                for(Detail detail : pModelFromDB.details) {
+                    detail.fleur.stock = detail.fleur.stock + detail.quantite;
+                    fleurDAO.save(detail.fleur);
+                }
+            }
+            pModelFromDB.status = pModel.status;
+        }
+    }
+
     public Ticket goToNextStatus(final Long pId) throws EntityNotFoundException, EntityNotAllowedException {
         Ticket modelFromDB = get(pId);
         switch (modelFromDB.status) {
@@ -72,9 +83,20 @@ public class TicketService {
                 modelFromDB.status = Status.DONE;
                 break;
             case DONE:
+                modelFromDB.status = Status.BAG;
+                break;
+            case BAG:
                 modelFromDB.status = Status.RELEASED;
+                //maj stock
+                for(Detail detail : modelFromDB.details) {
+                    detail.fleur.stock = detail.fleur.stock - detail.quantite;
+                    fleurDAO.save(detail.fleur);
+                }
                 break;
             case RELEASED:
+                modelFromDB.status = Status.ARCHIVED;
+                break;
+            case ARCHIVED:
                 throw new EntityNotAllowedException("Le Statut RELEASED est final.");
         }
         return ticketDAO.save(modelFromDB);
@@ -91,9 +113,19 @@ public class TicketService {
             case DONE:
                 modelFromDB.status = Status.TODO;
                 break;
-            case RELEASED:
+            case BAG:
                 modelFromDB.status = Status.DONE;
                 break;
+            case RELEASED:
+                modelFromDB.status = Status.BAG;
+                //maj stock
+                for(Detail detail : modelFromDB.details) {
+                    detail.fleur.stock = detail.fleur.stock + detail.quantite;
+                    fleurDAO.save(detail.fleur);
+                }
+                break;
+            case ARCHIVED:
+                throw new EntityNotAllowedException("Le Statut ARCHIVED ne peut être annulé.");
         }
         return ticketDAO.save(modelFromDB);
     }
@@ -115,6 +147,8 @@ public class TicketService {
     }
 
     public void delete(final Long pId) throws EntityNotFoundException {
-        ticketDAO.delete(get(pId));
+        Ticket t = get(pId);
+        detailDAO.deleteAll(t.details);
+        ticketDAO.delete(t);
     }
 }

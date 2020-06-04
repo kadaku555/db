@@ -1,7 +1,7 @@
-package com.example.demo.dto.flower;
+package com.jsaillant.db.flower;
 
-import com.example.demo.models.flower.Detail;
-import com.example.demo.models.flower.Fleur;
+import com.jsaillant.db.flower.Detail;
+import com.jsaillant.db.flower.Fleur;
 
 public class DetailDTO {
 

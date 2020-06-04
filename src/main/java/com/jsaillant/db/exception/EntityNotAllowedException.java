@@ -1,4 +1,4 @@
-package com.example.demo.exception;
+package com.jsaillant.db.exception;
 
 public class EntityNotAllowedException extends Exception {
 

@@ -1,11 +1,7 @@
-package com.example.demo.controllers;
+package com.jsaillant.db.flower;
 
-import com.example.demo.dto.flower.FleurDTO;
-import com.example.demo.dto.flower.TicketDTO;
-import com.example.demo.exception.EntityNotAllowedException;
-import com.example.demo.exception.EntityNotFoundException;
-import com.example.demo.models.flower.Ticket;
-import com.example.demo.services.flower.TicketService;
+import com.jsaillant.db.exception.EntityNotAllowedException;
+import com.jsaillant.db.exception.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -115,16 +111,8 @@ public class TicketController {
 
     @RequestMapping(value = "/tickets", produces = "Application/json")
     public ResponseEntity list() {
-        List<TicketDTO> res = new ArrayList<>();
         List<Ticket> tickets = ticketService.list();
-        for (Ticket t : tickets) {
-            TicketDTO tdto = new TicketDTO();
-            tdto.id = t.id;
-            tdto.contact = t.contact;
-            tdto.status = t.status.name();
-            res.add(tdto);
-        }
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return new ResponseEntity<>(tickets.stream().map(t -> new TicketDTO(t)).collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/ticket/{id}", produces = "Application/json", method = RequestMethod.DELETE)

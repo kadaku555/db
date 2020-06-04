@@ -1,9 +1,10 @@
-package com.example.demo.models.flower;
+package com.jsaillant.db.flower;
 
+import com.jsaillant.db.flower.Detail;
+import com.jsaillant.db.flower.Status;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 

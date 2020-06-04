@@ -1,5 +1,6 @@
-package com.example.demo.models.flower;
+package com.jsaillant.db.flower;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,7 +18,9 @@ public class Fleur {
 
     public Integer clochette;
 
-    public Integer tmn;
+    public Double tmn;
 
     public String commentaire;
+
+    public Integer stock = 0;
 }

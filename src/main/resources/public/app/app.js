@@ -8,44 +8,77 @@ app.controller('flowerCtrl', function($scope, $http, $timeout, $uibModal) {
 
     //__PRIVATE__//
 
-    var fleurs = [];
+
     var allowRefresh = true;
 
     var load = function(){
             $http.get("/tickets").then(
                 function(data) {
+                    var stock = {};
                     $scope.newTicket = [];
                     $scope.todoTicket = [];
                     $scope.doneTicket = [];
+                    $scope.bagTicket = [];
                     $scope.releasedTicket = [];
                     angular.forEach(data.data, function(ticket) {
                         switch(ticket.status) {
                             case "NEW":
                                 $scope.newTicket.push(ticket);
+                                angular.forEach(ticket.details, function(d) {
+                                    stock[d.fleur] = (stock[d.fleur]?stock[d.fleur]:0) + d.quantite;
+                                });
                                 break;
                             case "TODO":
                                 $scope.todoTicket.push(ticket);
+                                angular.forEach(ticket.details, function(d) {
+                                    stock[d.fleur] = (stock[d.fleur]?stock[d.fleur]:0) + d.quantite;
+                                });
                                 break;
                             case "DONE":
                                 $scope.doneTicket.push(ticket);
+                                angular.forEach(ticket.details, function(d) {
+                                    stock[d.fleur] = (stock[d.fleur]?stock[d.fleur]:0) + d.quantite;
+                                });
+                                break;
+                            case "BAG":
+                                $scope.bagTicket.push(ticket);
+                                angular.forEach(ticket.details, function(d) {
+                                    stock[d.fleur] = (stock[d.fleur]?stock[d.fleur]:0) + d.quantite;
+                                });
                                 break;
                             case "RELEASED":
                                 $scope.releasedTicket.push(ticket);
                                 break;
                         }
-                    })
+                    });
+                    $http.get("/fleurs").then(
+                        function(data) {
+                            $scope.fleurs = data.data;
+                            angular.forEach($scope.fleurs, function(fleur) {
+                                fleur.stock = fleur.stock - (stock[fleur.id+""]?stock[fleur.id+""]:0);
+                            });
+                        },
+                        function(error) {
+                            console.log(error);
+                            alert(error);
+                        }
+                    );
                 },
                 function(error) {
                     console.log(error);
                 }
             );
+
         };
 
     //__PUBLIC__//
 
+    $scope.fleurs = [];
+
     $scope.newTicket = [];
     $scope.todoTicket = [];
     $scope.doneTicket = [];
+    $scope.bagTicket = [];
     $scope.releasedTicket = [];
 
     $scope.nextStatus = function(id) {
@@ -73,28 +106,30 @@ app.controller('flowerCtrl', function($scope, $http, $timeout, $uibModal) {
     $scope.refresh = function() {
         if (allowRefresh) {
             load();
-            $timeout($scope.refresh, 30000);
         }
+        $timeout($scope.refresh, 10000);
     }
 
     $scope.create = function() {
-        $scope.open({status: "NEW"}, "Nouvelle commande").result.then(
+        $scope.open({status: "NEW", details:[]}, "Nouvelle commande").result.then(
             function (ticket) {
                 $http.post("/ticket", ticket).then(
                     function() {
                         allowRefresh = true;
-                        $scope.refresh();
+                        load();
                     },
                     function(error) {
                         console.log(error);
                         alert(error);
                         allowRefresh = true;
-                        $scope.refresh();
+                        load();
                     }
                 )
             },
             function () {
                 console.log('Modal dismissed at: ' + new Date());
+                allowRefresh = true;
+                load();
             }
         );
     };
@@ -107,18 +142,20 @@ app.controller('flowerCtrl', function($scope, $http, $timeout, $uibModal) {
                         $http.put("/ticket/"+id, ticket).then(
                             function() {
                                 allowRefresh = true;
-                                $scope.refresh();
+                                load();
                             },
                             function(error) {
                                 console.log(error);
                                 alert(error);
                                 allowRefresh = true;
-                                $scope.refresh();
+                                load();
                             }
                         )
                     },
                     function () {
                         console.log('Modal dismissed at: ' + new Date());
+                        allowRefresh = true;
+                        load();
                     }
                 );
             },
@@ -156,7 +193,7 @@ app.controller('flowerCtrl', function($scope, $http, $timeout, $uibModal) {
                 return title;
             },
             fleurs: function() {
-                return fleurs;
+                return $scope.fleurs;
             }
           }
         });
@@ -167,21 +204,31 @@ app.controller('flowerCtrl', function($scope, $http, $timeout, $uibModal) {
 
     $scope.refresh();
 
-    $http.get("/fleurs").then(
-        function(data) {
-            fleurs = data.data;
-        },
-        function(error) {
-            console.log(error);
-            alert(error);
-        }
-    );
 });
 
 app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, ticket, title, fleurs) {
+
+    var prices = {};
+
     $scope.ticket = ticket;
     $scope.title = title;
     $scope.fleurs = fleurs;
+
+    $scope.getTotalBell = function() {
+        var prix = 0;
+        angular.forEach($scope.ticket.details, function(detail) {
+            prix = prix + (detail.quantite * prices[detail.fleur].bell);
+        });
+        return prix;
+    };
+
+    $scope.getTotalTnm = function() {
+        var prix = 0;
+        angular.forEach($scope.ticket.details, function(detail) {
+            prix = prix + (detail.quantite * prices[detail.fleur].tnm);
+        });
+        return prix;
+    };
 
     $scope.addDetail = function() {
         $scope.ticket.details.push({quantite: 0});
@@ -194,6 +241,10 @@ app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, ticket,
     $scope.cancel = function () {
         $uibModalInstance.dismiss('cancel');
     };
+
+    angular.forEach($scope.fleurs, function(fleur) {
+        prices[fleur.id] = {bell: fleur.clochette, tnm: fleur.tmn};
+    });
 });
 
 app.controller('hCtrl', function($scope, $http, $routeParams) {
