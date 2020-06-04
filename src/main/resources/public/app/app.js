@@ -308,6 +308,32 @@ app.controller('hCtrl', function($scope, $http, $routeParams) {
 
 });
 
+app.controller('milaCtrl', function($scope) {
+
+    var lettre = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+
+    $scope.next = function(event) {
+        event.preventDefault();
+        $scope.state = {color: "blue", fontColor: "black", text: lettre[Math.floor(Math.random() * 26)], func: $scope.result};
+    };
+
+    var ok = {color: "lightgreen", fontColor: "green", text: "OK", func: $scope.next};
+    var ko = {color: "lightcoral", fontColor: "red", text: "KO", func: $scope.next};
+
+
+    $scope.result = function(event) {
+        event.preventDefault();
+        if (event.key.toLowerCase() == $scope.state.text.toLowerCase()) {
+            $scope.state = ok;
+        } else {
+            $scope.state = ko;
+        }
+    };
+
+    $scope.state = $scope.state = {color: "blue", fontColor: "black", text: "A", func: $scope.result};
+
+});
+
 app.controller('mainCtrl', function($scope, $http, base, dossier) {
     var selectedSerie = {};
     var selectedEpisode = {};
@@ -527,7 +553,11 @@ app.config(['$routeProvider',
         .when('/flower', {
             templateUrl: 'flower.html',
             controller: 'flowerCtrl'
-       });
+        })
+        .when('/mila', {
+            templateUrl: 'mila.html',
+            controller: 'milaCtrl'
+        });
     }
 ]);
 
