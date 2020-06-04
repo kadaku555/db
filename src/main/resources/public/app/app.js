@@ -1,7 +1,11 @@
 var app = angular.module('myApp', ["xeditable", "paginator", "ngTagsInput", "ngRoute", "ui.bootstrap"]);
 
 app.controller('homeCtrl', function($scope, $http) {
+    $scope.title;
 
+    $scope.setTitle = function(title) {
+        $scope.title = title;
+    };
 });
 
 app.controller('flowerCtrl', function($scope, $http, $timeout, $uibModal) {
@@ -202,6 +206,7 @@ app.controller('flowerCtrl', function($scope, $http, $timeout, $uibModal) {
 
     //__RUNTIME__//
 
+    $scope.setTitle("Projet Jardiland!");
     $scope.refresh();
 
 });
@@ -298,6 +303,7 @@ app.controller('hCtrl', function($scope, $http, $routeParams) {
     };
 
     //__RUNTIME__//
+    $scope.setTitle("Liste")
     $scope.load();
 
 });
@@ -463,6 +469,7 @@ app.controller('mainCtrl', function($scope, $http, base, dossier) {
     };
 
     //RUNTIME
+    $scope.setTitle("Liste des Animes");
     $scope.load();
 });
 
